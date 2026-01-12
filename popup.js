@@ -1,16 +1,61 @@
 const toggle = document.getElementById("toggleExtension");
 const status = document.getElementById("status");
+const errorMessage = document.getElementById("errorMessage");
 const showIdCheckbox = document.getElementById("showId");
 const showClassCheckbox = document.getElementById("showClass");
 const showTagCheckbox = document.getElementById("showTag");
 const showDataCheckbox = document.getElementById("showData");
 const showAllAttrsCheckbox = document.getElementById("showAllAttrs");
 
+// Check if current page is supported
+function checkPageSupport() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]) {
+      const url = tabs[0].url;
+      const unsupportedPatterns = [
+        "chrome://",
+        "chrome-extension://",
+        "edge://",
+        "about:",
+        "view-source:",
+        "https://chrome.google.com/webstore",
+        "https://chromewebstore.google.com",
+      ];
+
+      const isUnsupported = unsupportedPatterns.some((pattern) =>
+        url.startsWith(pattern)
+      );
+
+      if (isUnsupported) {
+        errorMessage.classList.add("show");
+        // Disable controls on unsupported pages
+        toggle.disabled = true;
+        showIdCheckbox.disabled = true;
+        showClassCheckbox.disabled = true;
+        showTagCheckbox.disabled = true;
+        showDataCheckbox.disabled = true;
+        showAllAttrsCheckbox.disabled = true;
+      } else {
+        errorMessage.classList.remove("show");
+        toggle.disabled = false;
+        showIdCheckbox.disabled = false;
+        showClassCheckbox.disabled = false;
+        showTagCheckbox.disabled = false;
+        showDataCheckbox.disabled = false;
+        showAllAttrsCheckbox.disabled = false;
+      }
+    }
+  });
+}
+
+// Check page support on load
+checkPageSupport();
+
 // Load saved state
 chrome.storage.sync.get(
   ["enabled", "showId", "showClass", "showTag", "showData", "showAllAttrs"],
   (result) => {
-    const isEnabled = result.enabled !== false; // Default to true
+    const isEnabled = result.enabled === true; // Default to false
     toggle.checked = isEnabled;
     updateStatus(isEnabled);
 
