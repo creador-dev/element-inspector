@@ -34,8 +34,9 @@ Control what information appears in the tooltip:
 ### From Source
 
 1. Clone this repository or download the ZIP file
+
    ```bash
-   git clone https://github.com/yourusername/element-inspector.git
+   git clone https://github.com/creador-dev/element-inspector.git
    ```
 
 2. Open Chrome and navigate to `chrome://extensions/`
@@ -50,7 +51,7 @@ Control what information appears in the tooltip:
 
 ### From Chrome Web Store
 
-*Coming soon!*
+_Coming soon!_
 
 ## 📖 How to Use
 
@@ -76,23 +77,27 @@ Control what information appears in the tooltip:
 ## 💼 Use Cases
 
 ### For Developers
+
 - Quickly identify elements for CSS selectors
 - Debug HTML structure without opening DevTools
 - Verify class names and IDs during development
 - Inspect attributes for JavaScript manipulation
 
 ### For QA Engineers
+
 - Find element IDs for test automation (Selenium, Cypress, Playwright)
 - Verify proper attribute usage in web applications
 - Document element selectors for test cases
 - Validate dynamic content changes
 
 ### For Web Scraping
+
 - Identify target elements for data extraction
 - Quickly find unique identifiers
 - Verify attribute patterns across pages
 
 ### For Learning
+
 - Understand HTML structure of real websites
 - See how professional sites use classes and IDs
 - Learn attribute patterns and best practices
