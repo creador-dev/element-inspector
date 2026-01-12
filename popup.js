@@ -81,10 +81,20 @@ toggle.addEventListener("change", (e) => {
   // Notify content script
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        action: "toggleExtension",
-        enabled: isEnabled,
-      });
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        {
+          action: "toggleExtension",
+          enabled: isEnabled,
+        },
+        (response) => {
+          // Ignore errors for pages where content script isn't injected
+          if (chrome.runtime.lastError) {
+            // Silently handle the error
+            return;
+          }
+        }
+      );
     }
   });
 });
@@ -105,10 +115,20 @@ function handleDisplayOptionChange() {
   // Notify content script
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        action: "updateDisplayOptions",
-        options: options,
-      });
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        {
+          action: "updateDisplayOptions",
+          options: options,
+        },
+        (response) => {
+          // Ignore errors for pages where content script isn't injected
+          if (chrome.runtime.lastError) {
+            // Silently handle the error
+            return;
+          }
+        }
+      );
     }
   });
 }
