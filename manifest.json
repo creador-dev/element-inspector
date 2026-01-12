@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "ID Detector",
+  "version": "1.0.0",
+  "description": "Detects and displays element IDs on hover",
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ]
+}
