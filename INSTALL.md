@@ -11,20 +11,37 @@
 ## Using the Extension
 
 - Navigate to any webpage
-- Hover over any HTML element that has an `id` attribute
-- A tooltip will appear showing the element's ID
+- Hover over any HTML element
+- A tooltip will appear showing the element's details based on your display options
 - The element will be highlighted with a blue outline
 - Move your mouse away to remove the highlight and tooltip
+- Click the extension icon to configure display options
 
 ## Features
 
-- Automatically detects all elements with IDs
-- Works with dynamically loaded content
-- Non-intrusive tooltip display
-- Visual highlighting of hovered elements
+- **Display Options**: Choose what information to show
+  - Element ID
+  - Class names
+  - HTML tag name
+  - Data attributes (data-\*)
+  - All other attributes
+- **Toggle On/Off**: Easily enable or disable the extension
+- **Real-time Updates**: Works with dynamically loaded content
+- **Clean Interface**: Non-intrusive tooltip with multiline display
+- **Visual Highlighting**: Blue outline shows the inspected element
+
+## Display Options
+
+Click the extension icon in your toolbar to access the popup and configure:
+
+- **Show ID**: Display element's ID attribute
+- **Show Class Name**: Display element's classes
+- **Show Tag Name**: Display HTML tag (e.g., `<div>`, `<button>`)
+- **Show Data Attributes**: Display all data-\* attributes
+- **Show All Attributes**: Display all other HTML attributes
 
 ## Notes
 
 - The extension works on all websites
-- No configuration needed
-- Icons are optional (placeholder references in manifest.json)
+- Settings are saved across browser sessions
+- Only attributes that exist are shown (no "none" messages)

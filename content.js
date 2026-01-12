@@ -6,10 +6,99 @@ document.body.appendChild(tooltip);
 
 // Track current highlighted element
 let currentElement = null;
+let isEnabled = true; // Default to enabled
+let displayOptions = {
+  showId: true,
+  showClass: true,
+  showTag: true,
+  showData: true,
+  showAllAttrs: false,
+};
+
+// Load enabled state and display options from storage
+chrome.storage.sync.get(
+  ["enabled", "showId", "showClass", "showTag", "showData", "showAllAttrs"],
+  (result) => {
+    isEnabled = result.enabled !== false; // Default to true
+    displayOptions.showId = result.showId !== false;
+    displayOptions.showClass = result.showClass !== false;
+    displayOptions.showTag = result.showTag !== false;
+    displayOptions.showData = result.showData !== false;
+    displayOptions.showAllAttrs = result.showAllAttrs === true;
+  }
+);
+
+// Listen for toggle messages from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "toggleExtension") {
+    isEnabled = request.enabled;
+    if (!isEnabled && currentElement) {
+      hideTooltip(currentElement);
+    }
+  } else if (request.action === "updateDisplayOptions") {
+    displayOptions = request.options;
+    // Update tooltip if currently showing
+    if (currentElement) {
+      showTooltip(currentElement);
+    }
+  }
+});
 
 // Function to show tooltip
-function showTooltip(element, id) {
-  tooltip.textContent = id ? `ID: ${id}` : "No ID detected";
+function showTooltip(element) {
+  const parts = [];
+
+  // Build tooltip text based on display options
+  if (displayOptions.showTag) {
+    parts.push(`<${element.tagName.toLowerCase()}>`);
+  }
+
+  if (displayOptions.showId && element.id) {
+    parts.push(`ID: ${element.id}`);
+  }
+
+  if (displayOptions.showClass) {
+    if (element.className && typeof element.className === "string") {
+      const classes = element.className.trim();
+      if (classes) {
+        parts.push(`Class: ${classes}`);
+      }
+    }
+  }
+
+  if (displayOptions.showData) {
+    // Get all data attributes
+    const dataAttrs = [];
+    for (let attr of element.attributes) {
+      if (attr.name.startsWith("data-")) {
+        dataAttrs.push(`${attr.name}: ${attr.value}`);
+      }
+    }
+    if (dataAttrs.length > 0) {
+      parts.push(...dataAttrs);
+    }
+  }
+
+  if (displayOptions.showAllAttrs) {
+    // Get all attributes
+    const allAttrs = [];
+    for (let attr of element.attributes) {
+      // Skip id, class, and data attributes if they're already shown
+      if (
+        (displayOptions.showId && attr.name === "id") ||
+        (displayOptions.showClass && attr.name === "class") ||
+        (displayOptions.showData && attr.name.startsWith("data-"))
+      ) {
+        continue;
+      }
+      allAttrs.push(`${attr.name}: ${attr.value}`);
+    }
+    if (allAttrs.length > 0) {
+      parts.push(...allAttrs);
+    }
+  }
+
+  tooltip.textContent = parts.length > 0 ? parts.join("\n") : "No data";
   tooltip.style.display = "block";
 
   // Position tooltip near the cursor
@@ -33,6 +122,9 @@ function hideTooltip(element) {
 
 // Global mouseover handler to show ID of exact element being hovered
 document.addEventListener("mouseover", (e) => {
+  // Check if extension is enabled
+  if (!isEnabled) return;
+
   const target = e.target;
 
   // Skip if it's our tooltip
@@ -45,8 +137,8 @@ document.addEventListener("mouseover", (e) => {
     if (currentElement) {
       hideTooltip(currentElement);
     }
-    // Show tooltip with ID if present, otherwise show "No ID detected"
-    showTooltip(target, target.id || null);
+    // Show tooltip with selected information
+    showTooltip(target);
   }
 });
 

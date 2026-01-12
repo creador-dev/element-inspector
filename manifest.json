@@ -1,9 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "ID Detector",
+  "name": "Element Inspector",
   "version": "1.0.0",
-  "description": "Detects and displays element IDs on hover",
-  "permissions": [],
+  "description": "Inspect HTML elements on hover - view IDs, classes, tags, and attributes instantly",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "id-icon.png",
+    "default_title": "Element Inspector"
+  },
   "icons": {
     "16": "id-icon.png",
     "48": "id-icon.png",
