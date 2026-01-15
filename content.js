@@ -61,7 +61,8 @@ function showTooltip(element) {
     if (element.className && typeof element.className === "string") {
       const classes = element.className.trim();
       if (classes) {
-        parts.push(`Class: ${classes}`);
+        const classList = classes.split(/\s+/).join(", ");
+        parts.push(`Classes: ${classList}`);
       }
     }
   }
@@ -101,10 +102,62 @@ function showTooltip(element) {
   tooltip.textContent = parts.length > 0 ? parts.join("\n") : "No data";
   tooltip.style.display = "block";
 
-  // Position tooltip near the cursor
+  // Get element and tooltip dimensions
   const rect = element.getBoundingClientRect();
-  tooltip.style.left = `${rect.left + window.scrollX}px`;
-  tooltip.style.top = `${rect.top + window.scrollY - 35}px`;
+  const tooltipRect = tooltip.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  const spacing = 10; // Space between element and tooltip
+  let left = rect.left + window.scrollX;
+  let top = rect.top + window.scrollY;
+
+  // Reset any previous transform
+  tooltip.style.transform = "none";
+
+  // Determine vertical position (top or bottom)
+  const spaceAbove = rect.top;
+  const spaceBelow = viewportHeight - rect.bottom;
+  const tooltipHeight = tooltipRect.height || 50; // Fallback height
+
+  if (spaceBelow >= tooltipHeight + spacing) {
+    // Position below the element
+    top = rect.bottom + window.scrollY + spacing;
+  } else if (spaceAbove >= tooltipHeight + spacing) {
+    // Position above the element
+    top = rect.top + window.scrollY - tooltipHeight - spacing;
+  } else {
+    // Not enough space above or below, position below anyway
+    top = rect.bottom + window.scrollY + spacing;
+  }
+
+  // Determine horizontal position (left, right, or center)
+  const tooltipWidth = tooltipRect.width || 200; // Fallback width
+  const spaceRight = viewportWidth - rect.left;
+  const spaceLeft = rect.right;
+
+  if (rect.left + tooltipWidth <= viewportWidth) {
+    // Align with left edge of element
+    left = rect.left + window.scrollX;
+  } else if (rect.right - tooltipWidth >= 0) {
+    // Align with right edge of element
+    left = rect.right + window.scrollX - tooltipWidth;
+  } else {
+    // Center in viewport
+    left = (viewportWidth - tooltipWidth) / 2 + window.scrollX;
+  }
+
+  // Ensure tooltip stays within viewport bounds
+  const minLeft = window.scrollX + spacing;
+  const maxLeft = window.scrollX + viewportWidth - tooltipWidth - spacing;
+  left = Math.max(minLeft, Math.min(left, maxLeft));
+
+  const minTop = window.scrollY + spacing;
+  const maxTop = window.scrollY + viewportHeight - tooltipHeight - spacing;
+  top = Math.max(minTop, Math.min(top, maxTop));
+
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
 
   // Highlight the element
   currentElement = element;
