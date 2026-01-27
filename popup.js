@@ -15,8 +15,9 @@ settingsContainer.classList.remove("hidden");
 // Check if current page is supported
 function checkPageSupport() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0] && tabs[0].url) {
-      const url = tabs[0].url;
+    if (tabs && tabs.length > 0 && tabs[0]) {
+      const tab = tabs[0];
+      const url = tab.url || "";
       console.log("Checking URL:", url);
 
       const unsupportedPatterns = [
@@ -30,7 +31,7 @@ function checkPageSupport() {
       ];
 
       const isUnsupported = unsupportedPatterns.some((pattern) =>
-        url.startsWith(pattern)
+        url.startsWith(pattern),
       );
 
       console.log("Is unsupported:", isUnsupported);
@@ -39,14 +40,15 @@ function checkPageSupport() {
         errorMessage.classList.add("show");
         settingsContainer.classList.add("hidden");
       } else {
+        // Regular supported page - show settings
         errorMessage.classList.remove("show");
         settingsContainer.classList.remove("hidden");
       }
     } else {
-      console.log("No valid tab or URL found");
-      // No valid tab or URL - show error
-      errorMessage.classList.add("show");
-      settingsContainer.classList.add("hidden");
+      console.log("No valid tab found - showing settings anyway");
+      // If we can't determine the tab, show settings anyway
+      errorMessage.classList.remove("show");
+      settingsContainer.classList.remove("hidden");
     }
   });
 }
@@ -68,7 +70,7 @@ chrome.storage.sync.get(
     showTagCheckbox.checked = result.showTag !== false;
     showDataCheckbox.checked = result.showData !== false;
     showAllAttrsCheckbox.checked = result.showAllAttrs === true; // Default to false
-  }
+  },
 );
 
 // Handle toggle changes
@@ -96,7 +98,7 @@ toggle.addEventListener("change", (e) => {
             // Silently handle the error
             return;
           }
-        }
+        },
       );
     }
   });
@@ -130,7 +132,7 @@ function handleDisplayOptionChange() {
             // Silently handle the error
             return;
           }
-        }
+        },
       );
     }
   });
